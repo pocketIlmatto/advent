@@ -28,7 +28,6 @@ def parse_instructions(matches)
 end
 
 
-
 def three_a(input_file)
   puts parse_instructions(get_matches(read_input(input_file)))
 end
