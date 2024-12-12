@@ -27,8 +27,9 @@ def build_rules_hash(rules_array, test_mode)
   rules
 end
 
-def check_updates(updates, rules_hash, test_mode)
-  middle_page_sum = 0
+def sort_updates(updates, rules_hash, test_mode)
+  legal_updates = []
+  illegal_updates = []
 
   updates.each do |update|
     update_pages = update.split(',')
@@ -54,20 +55,50 @@ def check_updates(updates, rules_hash, test_mode)
     end
 
     if is_update_legal
-      middle_page = update_pages[(update_pages.length-1)/2].to_i
-      puts "Adding middle page (#{middle_page} of this update: #{update_pages}" if test_mode
-      middle_page_sum += middle_page
+      legal_updates << update
+    else
+      illegal_updates << update
     end
     is_update_legal = true
   end
+  [legal_updates, illegal_updates]
+end
 
+def sum_middle_pages(updates, test_mode)
+  middle_page_sum = 0
+  updates.each do |update|
+    update_pages = update.split(',')
+
+    middle_page = update_pages[(update_pages.length-1)/2].to_i
+    puts "Adding middle page (#{middle_page} of this update: #{update_pages}" if test_mode
+
+    middle_page_sum += middle_page
+  end
   middle_page_sum
+end
+
+def sort_illegal_updates(updates, rules_hash, test_mode)
+  sorted_updates = []
+  updates.each do |illegal_update|
+    sorted_updates << illegal_update
+  end
+  sorted_updates
 end
 
 def five_a(input_file, test_mode = true)
   result = split_file_sections(input_file)
   rules_hash = build_rules_hash(result[:top_section], test_mode)
-  puts check_updates(result[:bottom_section], rules_hash, test_mode)
+  puts sum_middle_pages(sort_updates(result[:bottom_section], rules_hash, test_mode)[0], test_mode)
 end
 
-five_a('5input', true)
+def five_b(input_file, test_mode = true)
+  result = split_file_sections(input_file)
+  rules_hash = build_rules_hash(result[:top_section], test_mode)
+
+  sorted_illegal_updates = sort_illegal_updates(sort_updates(result[:bottom_section], rules_hash, test_mode)[1], rules_hash, test_mode)
+  puts sum_middle_pages(sorted_illegal_updates, test_mode)
+end
+
+five_b('5testInput', false)
+
+# five_a('5input', true)
